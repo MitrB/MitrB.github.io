@@ -4,15 +4,15 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
+[resume](https://github.com/MitrB/MitrB.github.io/tree/main/assets/resume.pdf)
 
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
+Hi, I'm Dmitry Buggenhout, the one thing I want you to know is that I love life. On a deep level I love it.
+I love thinking about life and I am infinitly curious about what others think about it.
 
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
+I am obsessed with the act of creation. I am captivated by the art we make, whether it be painting, poems, books, manga, sculpting, games, anime, movies ...
+I don't discriminate, I enjoy consuming these things and love picking them apart. Looking for experiences.
 
+I have a need to create. In my life, I have had the pleasure to play the guitar, dance, write, sculpt (3D software), film, make games and more.
+I love to enterain. And I deeply love making people think.
 
-[jekyll-organization]: https://github.com/jekyll
+I am making games, mostly as a designer and programmer.
