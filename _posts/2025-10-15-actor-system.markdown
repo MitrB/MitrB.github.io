@@ -5,15 +5,17 @@ date:   2025-10-15 14:00:43 +0200
 categories: game design 
 ---
 
-Imagine you are building a game where you have 15 characters you could possibly unlock. From these 15 characters, 3 characters could be taken on a "mission". A game with narrative moments where these characters have dialogue scenes with each other and NPCs. A game without a protagonist, so you can't let them do the heavy lifting by letting them talk most of the time and only occasionally depending on what other characters you brought let them have their moment to shine. You have to account for any combination of 3 characters out of 15. This means 455 possible combinations for any given dialogue sequence! How do you solve this?
+Imagine you are building a game where you have 15 characters you could possibly unlock. From these 15 characters, 3 characters could be taken on a "mission". A game with narrative moments where these characters have dialogue scenes with each other and NPCs. A game without a protagonist that does the heavy lifting by doing most of the talking. You have to account for any combination of 3 characters out of 15. This means 455 possible combinations for any given dialogue sequence! How do you solve this?
 
 I came up with the Actor System. A compromise to make this possible.
 
-The core idea is very simple: when encountering a dialogue scene, we assign a role to every character from the party. They perform the dialogue that was written for the actor. The hard part is actually taking this core idea and making it work. Assigning the actor roles and breaking the rules to accommodate for unique character interactions.
+The core idea is very simple: when encountering a dialogue scene, we assign a role to every character from the party. They perform the dialogue that was written for the role. Writing good and creative dialogue will do a lot of the heavy lifting. But we can be flexible and extend this core premise.
 
-There is one rule that can't be broken and makes this possible. There must be a fixed number of characters participating in any dialogue scene. In my case this was 3. This means that at any point in the game the player had a team of 3 characters. 
+To make my implementation simple, I held to one important rule: there must be a fixed number of characters participating in any dialogue scene. In my case this was 3. This means that at any point in the game the player had a team of 3 characters. This way I could write dialogue for any party of 3, while not having to write 455 different possibilities.
 
-In this writeup I'll try to lay down a generic framework anyone could use for such a narrative experience.
+I will also show how I extended my simple premise, giving myself more dialogue to write, but there is an important tradeof between having to write less and being able to express a character in a way that still feel believable.
+
+In this writeup I'll try to lay down a generic framework anyone could use for such a system.
 
 ## What is an Actor?
 
@@ -53,7 +55,7 @@ Some of you might have noticed one big issue for this system: This has the big d
 
 We can go even further and have different scenarios for a given dialogue sequence. Imagine that for the same dialogue sequence, like the example given before we might have a situation where we foresee another group of Actors. Maybe we have a much more subdued or active group, or maybe we have a completely different scenario if there is a specific character in the group.
 
-Let's get into the technical stuff by looking at some high level methods of achieving such an Actor system. Starting with mapping the Character Actors to Dialogue Actors.
+Let's get into the technical stuff by looking at some methods of achieving such an Actor system. Starting with mapping the Character Actors to Dialogue Actors.
 
 ## Mapping Characters to Actors
 
@@ -97,6 +99,12 @@ This is a very limiting way of using this system, but will work if you keep your
 
 Here's an example for 2 different scenarios for the same scene, which funnel in a common part. ![Example](/assets/ActorSystemExample.png)
 
+Given any combination of characters in this given dialogue sequence they will either be mapped to scenario 1 or 2. These scenarios have different party dynamics, giving a different feel to the conversation. In this dialogue sequence, we also decided to let these 2 scenarios converge to a generic dialogue sequence. I hope this shows what the system is trying to achieve.
+
 ## Closing thoughts
 
-This system tries to make sure that characters act in a way that feels natural during a dialogue sequence. We're essentially creating an illusion of depth. 
+This system tries to make sure that characters act in a way that feels natural during a dialogue sequence. We're essentially creating an illusion of depth. The system works best if the player is wondering (at least on first impresssion) if we really did write dialogue for every possible party combination.
+
+If at any point in reading this you got excited to play this game I am talking about... I'd have to dissapoint you as it is neither finished and neither is it in production. I am sure though that I will return to this concept. This was the first "big" game I was working on and at some point I decided to quit it, persuing other challenged. I basically chickened out, but I'm slowly gearing up to be capable to finish such a project. That I am sure of.
+
+But I wanted to share this system! Maybe it inspires you or maybe you can implement it in your own game...
