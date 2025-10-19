@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  I made: Goethe's Knot
+title:  "I made: Goethe's Knot"
 date:   2025-10-15 14:00:43 +0200
 categories: game design 
 ---
