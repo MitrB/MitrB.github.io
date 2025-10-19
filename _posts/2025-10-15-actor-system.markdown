@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "The Actor System : a solution for if your game has many talking protagonists."
+title:  "How not to write 455 dialogues for every cinematic : The Actor System"
 date:   2025-10-15 14:00:43 +0200
 categories: game design 
 ---
