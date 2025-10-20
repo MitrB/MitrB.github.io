@@ -7,7 +7,7 @@ categories: game design
 
 When [first](https://www.youtube.com/watch?v=yctM7oTLurA) hearing about [SpacetimeDB](https://spacetimedb.com/) I was very intrigued. I didn't have any experience creating backends for MMOs but I did have experience creating smaller multiplayer applications. The promise of efficiently running application logic on the database seemed too good to be true. Most importantly, I had a thought many will relate to "That seems easy to do! I should try it!".
 
-First, I will explain what SpacetimeDB does for you as a developer and designer in a very practical way. Then I will go over how I worked with it and the systems I developed that interact with it, focusing on the abilities system. Oh yeah... I should mention that this is about how I created data-driven abilities for a MOBA in SpacetimeDB.
+First, I will shortly explain what SpacetimeDB does for you as a developer and designer in a very practical way. Then I will go over how I worked with it and the systems I developed that interact with it, focusing on the abilities system. Oh yeah... I should mention that this is about how I created data-driven abilities for a MOBA in SpacetimeDB.
 
 ## SpacetimeDB's design
 
@@ -23,7 +23,7 @@ I wanted to create a MOBA game with the idea that my friends and I could play it
 
 ## Data-Driven Abilities
 
-The idea behind data-driven abilities is that your ability entity is defined as a data object, which doesn't execute any logic. You create component scripts which handle specific parts of what an ability should do. This sounds like an [Entity Component System](https://en.wikipedia.org/wiki/Entity_component_system)! It might not strictly be, but it definitely shares its core ideas.
+The idea behind data-driven abilities is that your ability entity is defined as a data object, which doesn't execute any logic. You create component scripts which handle specific parts of what an ability should do. This sounds like an [Entity Component System](https://en.wikipedia.org/wiki/Entity_component_system)! I ended up creating a system that feels similar to an ECS, but definitely limited to handling abilities.
 
 An ability might be a projectile that does magic damage. Okay, we can define the ability as an entity with a projectile data component. On the backend, we also provide a script that handles the projectile's movement and damage. But what if we want the projectile to create an explosion on impact? What if we want it to split into more projectiles? Do we create another component? An explosive projectile component? A split-projectile component? We can see that this leads us to bad design.
 
@@ -34,6 +34,8 @@ What I decided to do is to define abilities as directional graphs. The nodes are
 You can understand that if we want to change the behavior of this ability, it is very easy to do so. We can adjust the number of projectiles, or maybe we don't want it to split into three. Or maybe we want the split to happen regardless when the first projectile is done with an OnEnd trigger.
 
 Abilities in this system have a common data definition that holds information such as mana cost, ability name, etc. The nodes are entity-component definitions, both holding data and, by virtue of being a node of a certain type, defining its behavior (which is scripted in the backend).
+
+Now that you understand the concept, let's see how this translates to actual implementation in SpacetimeDB.
 
 ## SpacetimeDB specifics
 
@@ -72,7 +74,7 @@ public partial struct NodeDefinition
 }
 ```
 
-To represent the edges I define "Watchers", I'll get to how they trigger, for now look at the table definition.
+To represent the edges I define "Watchers". Think of watchers as conditional connections between nodes. A watcher sits on a node and waits for a specific event (like "OnHit" or "OnEnd"). When that event occurs, the watcher spawns the next node in the graph. This is how we create ability chains like when a projectile hits something, triggers its "OnHit" watcher, which spawns an explosion node.
 
 ```C#
 [Table(Name = "watcher_definition")]
@@ -170,7 +172,37 @@ function TriggerWatchers(ability_id, source_node_id, condition):
                     generate_watchers(ability_id, node.node_id)
 ```
 
-The rest of the system are methods and game loops that track active abilities and their nodes. If a node exists, its function will be executed by the corresponding script.
+The rest of the system are methods and game loops that track active abilities and their nodes. If a node exists, its function will be executed by the corresponding script. Each component type has its own update function that gets called every frame. Here's an example of a projectile component's update logic:
+
+```
+function ProjectileComponent.Update(delta_time, active_ability):
+    hit_volume = database.find_entity(this.hit_volume_id)
+
+    if hit_volume does not exist OR duration expired:
+        delete_hit_volume()
+        return
+
+    current_position = hit_volume.position
+    target_position = active_ability.target_position
+
+    if close_to_target AND end_on_target:
+        delete_hit_volume()
+        TriggerWatchers(active_ability.id, this.node_id, "OnHit")
+        return
+
+    duration -= delta_time
+
+    direction = normalize(target_position - current_position)
+    new_position = current_position + direction * speed * delta_time
+
+    if movement_type == "follow_terrain":
+        new_position = snap_to_terrain(new_position)
+
+    hit_volume.position = new_position
+    database.update_entity(hit_volume)
+```
+
+With the core system in place, the next question is: how do we actually create these abilities without writing code?
 
 ## Actually creating abilities (aka writing JSON files)
 
@@ -186,13 +218,13 @@ It supports defining new node/component types by specifying their name and field
 
 In this part I can glue the ability together. You can see the graph being reflected on the right side.
 
-![Editor](/assets/DataDrivenAbilities/EditApp.pngpng)
+![Editor](/assets/DataDrivenAbilities/EditApp.png)
 
 
-## Updating SpacetimeDB (aka reading JSON files)
+## Updating SpacetimeDB (aka reading JSON files) Even if it's not perfect.
 
 I wrote reducers for admin features. One of them is, of course, updating the abilities. It's pretty simple: the JSON file gets sent to SpacetimeDB and it creates records for Abilities, Nodes, and Watchers.
 
-## Caveats
+## Conclusion
 
-As of the moment of writing, SpacetimeDB only supports TCP. This means that for a real-time game, with possibly a lot of entities being scripted, the load can be pretty big.
+I quite liked my first experience with SpacetimeDB. I'm still finishing the project and there are other design aspects I could write about. But this is one system that I am proud of. Even if it's not perfect.
