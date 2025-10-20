@@ -186,7 +186,7 @@ It supports defining new node/component types by specifying their name and field
 
 In this part I can glue the ability together. You can see the graph being reflected on the right side.
 
-![Editor](/assets/DataDrivenAbilities/RootShow.png)
+![Editor](/assets/DataDrivenAbilities/EditApp.pngpng)
 
 
 ## Updating SpacetimeDB (aka reading JSON files)
